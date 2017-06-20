@@ -47,7 +47,7 @@ public final class CameraConfigurationUtils {
   private static final int MIN_PREVIEW_PIXELS = 480 * 320; // normal screen
   private static final float MAX_EXPOSURE_COMPENSATION = 1.5f;
   private static final float MIN_EXPOSURE_COMPENSATION = 0.0f;
-  private static final double MAX_ASPECT_DISTORTION = 0.15;
+  private static final double MAX_ASPECT_DISTORTION = 0.01;  //精准的偏值
   private static final int MIN_FPS = 10;
   private static final int MAX_FPS = 20;
   private static final int AREA_PER_1000 = 400;
@@ -311,8 +311,13 @@ public final class CameraConfigurationUtils {
       Log.i(TAG, "Supported preview sizes: " + previewSizesString);
     }
 
-    double screenAspectRatio = screenResolution.x / (double) screenResolution.y;
-
+//    double screenAspectRatio = screenResolution.x / (double) screenResolution.y;
+    double screenAspectRatio ;
+    if(screenResolution.x > screenResolution.y){
+      screenAspectRatio = (double) screenResolution.x / (double) screenResolution.y;
+    }else{
+      screenAspectRatio = (double) screenResolution.y / (double) screenResolution.x;
+    }
     // Remove sizes that are unsuitable
     Iterator<Camera.Size> it = supportedPreviewSizes.iterator();
     while (it.hasNext()) {
@@ -329,6 +334,7 @@ public final class CameraConfigurationUtils {
       int maybeFlippedHeight = isCandidatePortrait ? realWidth : realHeight;
       double aspectRatio = maybeFlippedWidth / (double) maybeFlippedHeight;
       double distortion = Math.abs(aspectRatio - screenAspectRatio);
+
       if (distortion > MAX_ASPECT_DISTORTION) {
         it.remove();
         continue;
